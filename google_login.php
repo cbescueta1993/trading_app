@@ -1,7 +1,7 @@
 <?php
 require 'config.php';
-//require 'vendor/autoload.php';
-/*
+require 'vendor/autoload.php';
+
 $client = new Google_Client();
 $client->setClientId(GOOGLE_CLIENT_ID);
 $client->setClientSecret(GOOGLE_CLIENT_SECRET);
@@ -9,7 +9,7 @@ $client->setRedirectUri(GOOGLE_REDIRECT_URI);
 $client->addScope("email");
 $client->addScope("profile");
 
-$login_url = $client->createAuthUrl();*/
+$login_url = $client->createAuthUrl();
 ?>
 <!DOCTYPE html>
 <html lang="en">
