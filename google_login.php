@@ -1,6 +1,6 @@
 <?php
 require 'config.php';
-require 'vendor/autoload.php';
+//require 'vendor/autoload.php';
 
 $client = new Google_Client();
 $client->setClientId(GOOGLE_CLIENT_ID);
