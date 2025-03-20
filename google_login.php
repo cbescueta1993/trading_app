@@ -1,4 +1,5 @@
 <?php
+echo "Test";
 require 'config.php';
 require 'vendor/autoload.php';
 
