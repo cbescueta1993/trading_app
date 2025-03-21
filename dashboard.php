@@ -63,7 +63,12 @@ include 'binance_api.php';
                     <h5 class="mt-2">Settings</h5>
                 </a>
             </div>
-            
+            <div class="col-md-4">
+                <a href="error.php" class="card text-center p-3 shadow text-decoration-none text-dark">
+                    <i class="fas fa-cog fa-3x"></i>
+                    <h5 class="mt-2">Error logs</h5>
+                </a>
+            </div>
         </div>
         
         <div class="row mt-5">

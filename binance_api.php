@@ -36,6 +36,7 @@ function getMarketPrice($symbol) {
         return floatval($data['price']); // Return price as float for consistency
 
     } catch (Exception $e) {
+        logError($symbol, $e->getMessage()); // Log error to database
         //logTrade("$symbol;".$e->getMessage());
 		//die("$symbol;".$e->getMessage());
         return null; // Return null in case of failure
@@ -100,6 +101,7 @@ function getSymbolPrecision($symbol) {
         throw new Exception("Symbol $symbol not found in exchange info");
 
     } catch (Exception $e) {
+        logError($symbol, $e->getMessage()); // Log error to database
         //logTrade("$symbol;".$e->getMessage());
 		//die("$symbol;".$e->getMessage());
         return [
@@ -219,6 +221,7 @@ function getPercentPriceFilter($symbol) {
         throw new Exception("Symbol $symbol not found in exchange info");
 
     } catch (Exception $e) {
+        logError($symbol, $e->getMessage()); // Log error to database
         //logTrade("$symbol;".$e->getMessage());
 		//die("$symbol;".$e->getMessage());
         return [
@@ -282,4 +285,14 @@ function binance_futures_request($url, $params = [], $method) {
     return json_decode($response, true);
 }
 
+
+function logError($coinName, $errorMessage) {
+    global $conn; // Ensure $conn is defined in config.php
+    global $user_id;
+
+    $stmt = $conn->prepare("INSERT INTO error_logs (coin_name, error_message,google_id) VALUES (?, ?,?)");
+    $stmt->bind_param("sss", $coinName, $errorMessage,$user_id);
+    $stmt->execute();
+    $stmt->close();
+}
 ?>
