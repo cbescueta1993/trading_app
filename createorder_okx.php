@@ -26,56 +26,54 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
-//$binance_futures_url = BINANCE_FUTURE_URL;
-//$api_key = $user['api_key'];
-//$api_secret = $user['api_secret'];
-
 $paramMargin = $user['margin'];
 $paramLeverage = $user['leverage'];
 
-
-//$amount_usdt = $margin;
-
-
 class OKXTrading {
-
+    // API credentials - make sure these match your environment (demo or live)
     public $apiKey = "8305ab39-255f-4e4a-a5dd-dff2753b0bce";
     public $secretKey = "AB3C0619E476262ED8ED460276BAD016";
     public $passphrase = "Elleryc1993$";
-    public $baseUrl = 'https://www.okx.com'; // Testnet Base URL
-    public $_entryPrice=0;
-    public $_quantity=0;
-    public $instId = ""; // Swap contract for perpetual futures
     
-
-    public function __construct(){
-       // echo $baseUrl;
-        
+    // Use the correct base URL
+    public $baseUrl = 'https://www.okx.com'; // Production URL
+    // For demo trading use: https://www.okx-sandbox.com
+    
+    public $_entryPrice = 0;
+    public $_quantity = 0;
+    public $instId = ""; // Swap contract for perpetual futures
+    public $isDemoTrading = false; // Set to true for demo/sandbox trading
+    
+    public function __construct() {
+        // If using demo trading, update the base URL accordingly
+        if ($this->isDemoTrading) {
+            $this->baseUrl = 'https://www.okx.com'; // Demo/Sandbox URL
+        }
     }
-    public function setentryPrice($entryPrice){
-        $this->_entryPrice=$entryPrice;
+    
+    public function setentryPrice($entryPrice) {
+        $this->_entryPrice = $entryPrice;
     }
 
-    public function setquantity($quantity){
-        $this->_quantity=$quantity;
+    public function setquantity($quantity) {
+        $this->_quantity = $quantity;
     }
 
-    public function getentryprice(){
+    public function getentryprice() {
         return $this->_entryPrice;
     }
-    public function getquantity(){
+    
+    public function getquantity() {
         return $this->_quantity;
     }
     
-
-     // ✅ Generate API Signature
-     private function generateSignature($timestamp, $method, $endpoint, $body) {
+    // Generate API Signature
+    private function generateSignature($timestamp, $method, $endpoint, $body) {
         $message = $timestamp . $method . $endpoint . $body;
         return base64_encode(hash_hmac("sha256", $message, $this->secretKey, true));
     }
     
-
-    // ✅ Send API Request (GET, POST, DELETE)
+    // Send API Request (GET, POST, DELETE)
     public function sendRequest($method, $endpoint, $payload = []) {
         $url = $this->baseUrl . $endpoint;
         $timestamp = number_format(microtime(true), 3, '.', '');
@@ -88,11 +86,18 @@ class OKXTrading {
             "OK-ACCESS-PASSPHRASE: {$this->passphrase}",
             "Content-Type: application/json"
         ];
+        
+        // Add the demo trading header if in demo mode
+        if ($this->isDemoTrading) {
+            $headers[] = "x-simulated-trading: 1";
+        }
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For testing only, enable in production
 
         if ($method === "POST") {
             curl_setopt($ch, CURLOPT_POST, true);
@@ -102,15 +107,57 @@ class OKXTrading {
         }
 
         $response = curl_exec($ch);
+        $error = curl_error($ch);
+        
+        if ($error) {
+            return ["error" => "CURL Error: " . $error];
+        }
+        
         curl_close($ch);
-
         return json_decode($response, true);
     }
 
+    // Send GET Request with parameters
+    public function sendRequestGet($endpoint, $params = []) {
+        if (!empty($params)) {
+            $queryString = http_build_query($params);
+            $endpoint = $endpoint . '?' . $queryString;
+        }
+        
+        return $this->sendRequest("GET", $endpoint);
+    }
 
-    // Step 1: Close All Positions for PEPE Futures (Testnet)
+    // Validate if instrument ID exists before proceeding
+    public function validateInstrumentId() {
+        if (empty($this->instId)) {
+            return false;
+        }
+        
+        $endpoint = "/api/v5/public/instruments";
+        $params = ["instType" => "SWAP", "instId" => $this->instId];
+        
+        $response = $this->sendRequestGet($endpoint, $params);
+        
+        if (!isset($response["data"]) || empty($response["data"])) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    // Close All Positions for a specific instrument
     public function closePositions() {
-        $endpoint = "/api/v5/account/close-positions";
+        // First check if we have any positions to close
+        $positionsEndpoint = "/api/v5/account/positions";
+        $params = ["instId" => $this->instId];
+        $positions = $this->sendRequestGet($positionsEndpoint, $params);
+        
+        // If no positions or error, return early
+        if (!isset($positions["data"]) || empty($positions["data"])) {
+            return ["msg" => "No positions to close", "code" => "0"];
+        }
+        
+        $endpoint = "/api/v5/trade/close-position";
         $payload = [
             "instId" => $this->instId,
             "mgnMode" => "isolated",
@@ -120,58 +167,47 @@ class OKXTrading {
         return $this->sendRequest("POST", $endpoint, $payload);
     }
 
-    // Step 2: Set Margin Mode to Isolated & Leverage to 3x (Testnet)
+    // Set Margin Mode to Isolated & Leverage
     public function setLeverage($leverage) {
         $endpoint = "/api/v5/account/set-leverage";
         $payload = [
             "instId" => $this->instId,
-            "lever" => $leverage,
+            "lever" => (string)$leverage,
             "mgnMode" => "isolated"
         ];
 
         return $this->sendRequest("POST", $endpoint, $payload);
     }
 
-    
-
-    public function placeOrder($side, $dollarAmount) {
-        $endpoint = "/api/v5/trade/order";
-    
-        // Step 1: Fetch Current Price
-        $price = $this->getCurrentPrice();
-        if ($price <= 0) {
-            return ["error" => "Failed to fetch price"];
+    // Get instrument details
+    public function getInstrumentDetails() {
+        $endpoint = "/api/v5/public/instruments";
+        $params = ["instType" => "SWAP", "instId" => $this->instId];
+        
+        $response = $this->sendRequestGet($endpoint, $params);
+        
+        if (!isset($response["data"]) || empty($response["data"])) {
+            return null;
         }
-        $this->setentryPrice($price);
-
-        // Step 2: Fetch Lot Size
-        $lotSize = $this->getLotSize();
-        if ($lotSize <= 0) {
-            return ["error" => "Failed to fetch lot size"];
+        
+        foreach ($response["data"] as $instrument) {
+            if ($instrument["instId"] === $this->instId) {
+                return $instrument;
+            }
         }
-    
-        // Step 3: Calculate Quantity
-        $quantity = round(($dollarAmount / $price) / $lotSize) * $lotSize;
-        $this->setquantity($quantity);
-    
-        // Ensure the quantity is not zero
-        if ($quantity < $lotSize) {
-            return ["error" => "Order size too small. Increase dollar amount."];
-        }
-    
-        // Step 4: Prepare API Payload
-        $payload = [
-            "instId" => $this->instId,
-            "tdMode" => "isolated",
-            "side" => $side, // "buy" for long, "sell" for short
-            "ordType" => "market",
-            "sz" => $quantity
-        ];
-    
-        return $this->sendRequest("POST", $endpoint, $payload);
+        
+        return null;
     }
-    
-    // ✅ Fetch Current Market Price
+
+    // Get precision from lot size
+    public function getPrecision($lotSize) {
+        if (strpos($lotSize, '.') !== false) {
+            return strlen(substr(strrchr($lotSize, "."), 1));
+        }
+        return 0;
+    }
+
+    // Get current market price
     public function getCurrentPrice() {
         $endpoint = "/api/v5/market/ticker";
         $params = ["instId" => $this->instId];
@@ -184,122 +220,163 @@ class OKXTrading {
     
         return (float) $response["data"][0]["last"];
     }
-    
-    // ✅ Fetch Lot Size of the Instrument
-    public function getLotSize() {
-        $endpoint = "/api/v5/public/instruments";
-        $params = ["instType" => "SWAP"];
-    
-        $response = $this->sendRequestGet($endpoint, $params);
-    
-        if (!isset($response["data"])) {
-            return 0;
+
+    // Place an order
+    public function placeOrder($side, $dollarAmount, $leverage) {
+        // Validate instrument ID exists
+        if (!$this->validateInstrumentId()) {
+            return ["error" => "Invalid instrument ID: " . $this->instId];
         }
-    
-        foreach ($response["data"] as $instrument) {
-            if ($instrument["instId"] === $this->instId) {
-                return (float) $instrument["lotSz"]; // Lot size of the instrument
-            }
+        
+        // Step 1: Fetch market price
+        $entryPrice = $this->getCurrentPrice();
+        if ($entryPrice <= 0) {
+            return ["error" => "Failed to fetch market price"];
         }
+
+        // Step 2: Fetch instrument details
+        $instrument = $this->getInstrumentDetails();
+        if (!$instrument) {
+            return ["error" => "Failed to fetch instrument details"];
+        }
+
+        // Step 3: Extract necessary instrument details
+        $lotSize = floatval($instrument['lotSz'] ?? '0.001');
+        $minSize = floatval($instrument['minSz'] ?? '0.001');
+        $ctVal = floatval($instrument['ctVal'] ?? '1');
+        
+        echo "Lot Size: " . $lotSize . PHP_EOL;
+        echo "Min Size: " . $minSize . PHP_EOL;
+        echo "Entry Price: " . $entryPrice . PHP_EOL;
+        
+        // Calculate quantity based on leverage, dollar amount, and entry price
+        $quantity = ($dollarAmount * $leverage) / ($entryPrice * $ctVal);
+        echo "Initial quantity calculation: " . $quantity . PHP_EOL;
+
+        // Round quantity to nearest valid lot size
+        $precision = $this->getPrecision($lotSize);
+        $quantity = floor($quantity / $lotSize) * $lotSize;
+        $quantity = number_format($quantity, $precision, '.', '');
+        
+        // Ensure quantity meets minimum size requirement
+        if (floatval($quantity) < $minSize) {
+            $quantity = $minSize;
+        }
+        
+        echo "Final quantity: " . $quantity . PHP_EOL;
+        
+        // Store values for later use
+        $this->setentryPrice($entryPrice);
+        $this->setquantity($quantity);
     
-        return 0;
+        // Prepare API Payload
+        $payload = [
+            "instId" => $this->instId,
+            "tdMode" => "isolated",
+            "side" => $side, // "buy" for long, "sell" for short
+            "ordType" => "market",
+            "sz" => (string) $quantity
+        ];
+
+        echo "Sending order: " . json_encode($payload) . PHP_EOL;
+        return $this->sendRequest("POST", "/api/v5/trade/order", $payload);
     }
 
-    // ✅ Proper GET Request Handling
-    public function sendRequestGet($endpoint, $params = []) {
-        $queryString = http_build_query($params);
-        $url = $this->baseUrl . $endpoint . '?' . $queryString;
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        return json_decode($response, true);
-    }
-
+    // Get instrument ID from symbol
     public function getInsId($symbol) {
         $endpoint = "/api/v5/public/instruments";
-        $payload = ["instType" => "SWAP"]; // Get perpetual futures (swap contracts)
-
-        $response = $this->sendRequestGet($endpoint, $payload);
-
+        $params = ["instType" => "SWAP"];
+        
+        $response = $this->sendRequestGet($endpoint, $params);
+        
         if (!isset($response["data"])) {
-            return "Error fetching instruments.";
+            return null;
         }
-
+        
+        $symbol = strtoupper($symbol);
+        
         foreach ($response["data"] as $instrument) {
-            
-            if (stripos($instrument["instId"], strtoupper($symbol)) !== false) {
-                return $instrument["instId"]; // Return the first matching instrument ID
+            if (strpos($instrument["instId"], $symbol . "-USDT-SWAP") !== false) {
+                return $instrument["instId"];
             }
         }
-
-        return "Instrument ID not found for $symbol.";
+        
+        // Try alternative naming patterns
+        foreach ($response["data"] as $instrument) {
+            if (strpos($instrument["instId"], $symbol) !== false && 
+                strpos($instrument["instId"], "USDT-SWAP") !== false) {
+                return $instrument["instId"];
+            }
+        }
+        
+        return null;
     }
-
-    
 }
 
+// Log trade to database
 function log_trade($conn, $google_id, $symbol, $side, $quantity, $entry_price, $leverage, $margin, $status) {
-    try{
+    try {
         $query = "INSERT INTO trade_journal (google_id, symbol, side, quantity, entry_price, leverage, margin, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("ssssddds", $google_id, $symbol, $side, $quantity, $entry_price, $leverage, $margin, $status);
         $stmt->execute();
-    }catch(Exception $e){
-        echo $e;
+        echo "Trade logged successfully: $symbol $side" . PHP_EOL;
+    } catch (Exception $e) {
+        echo "Error logging trade: " . $e->getMessage() . PHP_EOL;
     }
-    
 }
 
-function logError($conn,$coinName, $errorMessage) {
-    try{
-        $stmt = $conn->prepare("INSERT INTO error_logs (coin_name, error_message,google_id) VALUES (?, ?,?)");
-        $stmt->bind_param("sss", $coinName, $errorMessage,$paramUserId);
+// Log error to database
+function logError($conn, $coinName, $errorMessage, $userId) {
+    try {
+        $stmt = $conn->prepare("INSERT INTO error_logs (coin_name, error_message, google_id) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $coinName, $errorMessage, $userId);
         $stmt->execute();
         $stmt->close();
-    }catch(Exception $e){
-        echo $e;
+        echo "Error logged: $coinName - $errorMessage" . PHP_EOL;
+    } catch (Exception $e) {
+        echo "Error logging to database: " . $e->getMessage() . PHP_EOL;
     }
-    
 }
 
-// Run the trading functions on Testnet
+// Create trading instance
 $okx = new OKXTrading();
 
+// Set symbol and get instrument ID
+echo "Searching for instrument ID for symbol: $paramSymbol" . PHP_EOL;
 $instrumentId = $okx->getInsId($paramSymbol);
+
+if ($instrumentId === null) {
+    $errorMsg = "Instrument ID not found for symbol: $paramSymbol";
+    logError($conn, $paramSymbol, $errorMsg, $paramUserId);
+    die($errorMsg);
+}
+
 $okx->instId = $instrumentId;
-//echo "instrumentId: " . $instrumentId . "\n";
+echo "Instrument ID found: " . $instrumentId . PHP_EOL;
 
-// Step 1: Close Positions
+// Step 1: Close any existing positions
 $closeResponse = $okx->closePositions();
-//echo "Closed Positions: " . json_encode($closeResponse) . "\n";
+echo "Close positions response: " . json_encode($closeResponse) . PHP_EOL;
 
-// Step 2: Set Leverage
+// Step 2: Set leverage
 $leverageResponse = $okx->setLeverage($paramLeverage);
-//echo "Leverage Set: " . json_encode($leverageResponse) . "\n";
+echo "Set leverage response: " . json_encode($leverageResponse) . PHP_EOL;
 
-// // Step 3: Place a Long Order (Testnet)
-$orderResponse = $okx->placeOrder($paramSide,$paramMargin); // Change to "sell" for a short position
+// Step 3: Place the order
+$orderResponse = $okx->placeOrder(strtolower($paramSide), $paramMargin, $paramLeverage);
+echo "Order response: " . json_encode($orderResponse) . PHP_EOL;
 
-if (isset($orderResponse["data"][0]["ordId"])) {
-    if(strlen($orderResponse["data"][0]["ordId"])>0){
-        $entryPrice = $okx->getentryprice();
-        $quantity = $okx->getquantity();
-        $status = "Success";
-        log_trade($conn, $paramUserId, $paramSymbol, $paramSide, $quantity, $entryPrice, $paramLeverage, $paramMargin, $status);
-        echo "Order Placed: " . json_encode($orderResponse) . "\n";
-    }else{
-        echo "Error: ".$paramSymbol."-".json_encode($orderResponse). "\n";
-        logError($conn,$paramSymbol, json_encode($orderResponse));
-    }
-    
+// Handle the order response
+if (isset($orderResponse["data"]) && isset($orderResponse["data"][0]["ordId"]) && !empty($orderResponse["data"][0]["ordId"])) {
+    $entryPrice = $okx->getentryprice();
+    $quantity = $okx->getquantity();
+    $status = "Success";
+    log_trade($conn, $paramUserId, $paramSymbol, $paramSide, $quantity, $entryPrice, $paramLeverage, $paramMargin, $status);
+    echo "Order placed successfully!" . PHP_EOL;
 } else {
-    logError($conn,$paramSymbol, json_encode($orderResponse));
-    echo "Error: ".$paramSymbol."-".json_encode($orderResponse). "\n";
+    $errorMsg = json_encode($orderResponse);
+    logError($conn, $paramSymbol, $errorMsg, $paramUserId);
+    echo "Error placing order: " . $errorMsg . PHP_EOL;
 }
 ?>
