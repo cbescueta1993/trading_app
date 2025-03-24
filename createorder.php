@@ -106,13 +106,15 @@ function log_trade($conn, $google_id, $symbol, $side, $quantity, $entry_price, $
     $stmt->execute();
 }
 
+$timestamp = round(microtime(true) * 1000); // Ensure timestamp is included
+$recvWindow = 10000; // Recommended recvWindow to prevent timing issues
+
 cancel_all_futures_orders($symbol);
 usleep(10000);
 close_futures_position($symbol);
 usleep(10000);
 
-$timestamp = round(microtime(true) * 1000); // Ensure timestamp is included
-$recvWindow = 10000; // Recommended recvWindow to prevent timing issues
+
 $leverage_response = binance_futures_request('/fapi/v1/leverage', [
     'symbol' => $symbol,
     'leverage' => $leverage,
