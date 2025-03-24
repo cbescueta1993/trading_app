@@ -96,7 +96,7 @@ function close_futures_position($symbol) {
         //     echo "Error placing order.";
         // }
     //}
-}
+} 
 
 // Function to insert logs into `trade_journal` table
 function log_trade($conn, $google_id, $symbol, $side, $quantity, $entry_price, $leverage, $margin, $status) {
