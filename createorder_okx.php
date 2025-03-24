@@ -97,7 +97,7 @@ class OKXTrading {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For testing only, enable in production
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE); // For testing only, enable in production
 
         if ($method === "POST") {
             curl_setopt($ch, CURLOPT_POST, true);
