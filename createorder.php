@@ -110,9 +110,9 @@ $timestamp = round(microtime(true) * 1000); // Ensure timestamp is included
 $recvWindow = 10000; // Recommended recvWindow to prevent timing issues
 
 cancel_all_futures_orders($symbol);
-usleep(10000);
+//usleep(10000);
 close_futures_position($symbol);
-usleep(10000);
+//usleep(10000);
 
 
 $leverage_response = binance_futures_request('/fapi/v1/leverage', [
@@ -122,7 +122,7 @@ $leverage_response = binance_futures_request('/fapi/v1/leverage', [
     "recvWindow" => $recvWindow,
 ], "POST");
 
-usleep(10000);
+//usleep(10000);
 
 $entryPrice = getMarketPrice($symbol);
 $precision = getSymbolPrecision($symbol);
