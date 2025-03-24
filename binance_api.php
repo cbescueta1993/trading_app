@@ -285,13 +285,13 @@ function binance_futures_request($url, $params = [], $method) {
 
         // Check if response contains 'code' and it's negative
         if (isset($decoded_response['code']) && $decoded_response['code'] < 0) {
-            logError($symbol,"Binance API Error: " . $decoded_response['msg'] ?? 'Unknown error');
+            logError($symbol,"Binance API Error: " .$decoded_response['code'] . " - " . $decoded_response['msg'] ?? 'Unknown error');
         }
 
         return $decoded_response;
     } catch (Exception $e) {
         logError($symbol, $e->getMessage()); // Log error to database
-        throw $e; // Re-throw exception for handling elsewhere
+        //throw $e; // Re-throw exception for handling elsewhere
     }
 }
 

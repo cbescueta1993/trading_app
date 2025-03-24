@@ -65,7 +65,7 @@ function close_futures_position($symbol) {
     //echo $positionAmt;
     usleep(10000);
     //die($positionAmt);
-    //if ($positionAmt != 0) {
+    if ($positionAmt != 0) {
         $timestamp = round(microtime(true) * 1000); // Ensure timestamp is included
         $recvWindow = 10000; // Recommended recvWindow to prevent timing issues
 
@@ -95,7 +95,7 @@ function close_futures_position($symbol) {
         // } else {
         //     echo "Error placing order.";
         // }
-    //}
+    }
 } 
 
 // Function to insert logs into `trade_journal` table
