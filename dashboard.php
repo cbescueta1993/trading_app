@@ -26,7 +26,8 @@ $amount_usdt = $margin;
 
 include 'binance_api.php';
 
-
+$timestamp = round(microtime(true) * 1000); // Ensure timestamp is included
+$recvWindow = 10000; // Recommended recvWindow to prevent timing issues
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -78,7 +79,7 @@ include 'binance_api.php';
                     <h5>Wallet Balance</h5>
                     <p>
                         <?php
-                        $response = binance_futures_request("/fapi/v2/balance", [], "GET");
+                        $response = binance_futures_request("/fapi/v2/balance", ["timestamp" => $timestamp,"recvWindow" => $recvWindow], "GET");
 
                         if (!is_array($response)) {
                             die("Error: Invalid response from Binance API");
@@ -102,7 +103,8 @@ include 'binance_api.php';
                     <h5>Open Positions</h5>
                     <p><?php 
                     // **Get Open Positions**
-                            $response = binance_futures_request('/fapi/v2/positionRisk', [], "GET");
+                    
+                            $response = binance_futures_request('/fapi/v3/positionRisk', ["timestamp" => $timestamp,"recvWindow" => $recvWindow], "GET");
 
                             if (isset($response['code'])) {
                                 die("Error: " . $response['msg']);

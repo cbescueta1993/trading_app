@@ -38,11 +38,15 @@ $amount_usdt = $margin;
 include "binance_api.php";
 
 function cancel_all_futures_orders($symbol) {
-    binance_futures_request("/fapi/v1/allOpenOrders", ["symbol" => $symbol], "DELETE");
+    $timestamp = round(microtime(true) * 1000); // Ensure timestamp is included
+    $recvWindow = 10000; // Recommended recvWindow to prevent timing issues
+    binance_futures_request("/fapi/v1/allOpenOrders", ["symbol" => $symbol,"timestamp" => $timestamp,"recvWindow" => $recvWindow], "DELETE");
 }
 
 function get_futures_position($symbol) {
-    $positions = binance_futures_request("/fapi/v2/positionRisk", ["symbol" => $symbol], "GET");
+    $timestamp = round(microtime(true) * 1000); // Ensure timestamp is included
+    $recvWindow = 10000; // Recommended recvWindow to prevent timing issues
+    $positions = binance_futures_request("/fapi/v3/positionRisk", ["symbol" => $symbol,"timestamp" => $timestamp,"recvWindow" => $recvWindow], "GET");
     if (!is_array($positions) || count($positions) == 0) {
         return 0;
     }
@@ -55,16 +59,43 @@ function get_futures_position($symbol) {
 }
 
 function close_futures_position($symbol) {
+    //$marketPrice = getMarketPrice($symbol); 
     $positionAmt = get_futures_position($symbol);
-    if ($positionAmt != 0) {
+    $quantity = abs(floatval($positionAmt));
+    //echo $positionAmt;
+    usleep(10000);
+    //die($positionAmt);
+    //if ($positionAmt != 0) {
+        $timestamp = round(microtime(true) * 1000); // Ensure timestamp is included
+        $recvWindow = 10000; // Recommended recvWindow to prevent timing issues
+
         $_side = ($positionAmt > 0) ? "SELL" : "BUY";
-        binance_futures_request("/fapi/v1/order", [
+       
+        $response = binance_futures_request("/fapi/v1/order", [
             "symbol" => $symbol,
             "side" => $_side,
-            "type" => "MARKET",
-            "quantity" => abs($positionAmt)
+            "type" => "MARKET", // Change to MARKET order for instant execution
+            "quantity" => $quantity, // Ensure correct quantity
+            "timestamp" => $timestamp,
+            "recvWindow" => $recvWindow,
         ], "POST");
-    }
+        // print_r([
+        //     "symbol" => $symbol,
+        //     "side" => $_side,
+        //     "type" => "MARKET", // Change to MARKET order for instant execution
+        //     "quantity" => $quantity, // Ensure correct quantity
+        //     "reduceOnly" => "true", // Prevents opening new position, only closes existing one
+        //     "timestamp" => $timestamp,
+        //     "recvWindow" => $recvWindow,
+        // ]);
+        // if ($response) {
+        //     echo "<br>";
+        //     print_r($response); // Debugging purpose
+        //     die();
+        // } else {
+        //     echo "Error placing order.";
+        // }
+    //}
 }
 
 // Function to insert logs into `trade_journal` table
@@ -80,9 +111,13 @@ usleep(10000);
 close_futures_position($symbol);
 usleep(10000);
 
+$timestamp = round(microtime(true) * 1000); // Ensure timestamp is included
+$recvWindow = 10000; // Recommended recvWindow to prevent timing issues
 $leverage_response = binance_futures_request('/fapi/v1/leverage', [
     'symbol' => $symbol,
-    'leverage' => $leverage
+    'leverage' => $leverage,
+    "timestamp" => $timestamp,
+    "recvWindow" => $recvWindow,
 ], "POST");
 
 usleep(10000);
@@ -112,7 +147,9 @@ while ($attempts < 3 && !$success) {
         'symbol' => $symbol,
         'side' => $side,
         'type' => 'MARKET',
-        'quantity' => $quantity
+        'quantity' => $quantity,
+        "timestamp" => $timestamp,
+        "recvWindow" => $recvWindow
     ], "POST");
 
     if (isset($order_response['orderId'])) {

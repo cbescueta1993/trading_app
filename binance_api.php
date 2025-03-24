@@ -232,58 +232,69 @@ function getPercentPriceFilter($symbol) {
 }
 
 function binance_futures_request($url, $params = [], $method) {
-    global $api_key, $api_secret, $binance_futures_url;
+    global $api_key, $api_secret, $binance_futures_url, $symbol;
 
-    $params['timestamp'] = round(microtime(true) * 1000); // Ensure timestamp is included
-    $params['recvWindow'] = 10000; // Recommended recvWindow to prevent timing issues
+    try {
+        // Construct query string
+        $query = http_build_query($params, '', '&');
+        
+        // Generate the HMAC signature
+        $signature = hash_hmac('sha256', $query, $api_secret);
+        
+        // Append signature to params
+        $query .= "&signature=$signature";
+        
+        // Set headers
+        $headers = ["X-MBX-APIKEY: $api_key"];
+        
+        $ch = curl_init();
+        $final_url = "$binance_futures_url$url";
 
-    // Construct query string
-    $query = http_build_query($params, '', '&');
+        // Handle HTTP methods
+        switch ($method) {
+            case "GET":
+                $final_url .= "?$query";
+                curl_setopt($ch, CURLOPT_URL, $final_url);
+                break;
 
-    // Generate the HMAC signature
-    $signature = hash_hmac('sha256', $query, $api_secret);
+            case "POST":
+                curl_setopt($ch, CURLOPT_URL, $final_url);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
+                break;
 
-    // Append signature to params
-    $query .= "&signature=$signature";
+            case "DELETE":
+                $final_url .= "?$query";
+                curl_setopt($ch, CURLOPT_URL, $final_url);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+                break;
 
-    // Set headers
-    $headers = ["X-MBX-APIKEY: $api_key"];
+            default:
+                throw new Exception("Invalid HTTP method: $method");
+        }
 
-    $ch = curl_init();
-    $final_url = "$binance_futures_url$url";
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
-    // Handle HTTP methods
-    switch ($method) {
-        case "GET":
-            $final_url .= "?$query";
-            curl_setopt($ch, CURLOPT_URL, $final_url);
-            break;
+        // Execute the request
+        $response = curl_exec($ch);
+        curl_close($ch);
+        
+        // Decode response
+        $decoded_response = json_decode($response, true);
 
-        case "POST":
-            curl_setopt($ch, CURLOPT_URL, $final_url);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
-            break;
+        // Check if response contains 'code' and it's negative
+        if (isset($decoded_response['code']) && $decoded_response['code'] < 0) {
+            logError($symbol,"Binance API Error: " . $decoded_response['msg'] ?? 'Unknown error');
+        }
 
-        case "DELETE":
-            $final_url .= "?$query";
-            curl_setopt($ch, CURLOPT_URL, $final_url);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
-            break;
-
-        default:
-            die("Invalid HTTP method: $method");
+        return $decoded_response;
+    } catch (Exception $e) {
+        logError($symbol, $e->getMessage()); // Log error to database
+        throw $e; // Re-throw exception for handling elsewhere
     }
-
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-    // Execute the request
-    $response = curl_exec($ch);
-    curl_close($ch);
-
-    return json_decode($response, true);
 }
+
 
 
 function logError($coinName, $errorMessage) {
