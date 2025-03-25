@@ -34,7 +34,7 @@ class OKXTrading {
     // API credentials - make sure these match your environment (demo or live)
     public $apiKey = "8305ab39-255f-4e4a-a5dd-dff2753b0bce";
     public $secretKey = "AB3C0619E476262ED8ED460276BAD016";
-    public $passphrase = "";
+    public $passphrase = "Elleryc1993$";
     
     // Use the correct base URL
     public $baseUrl = 'https://www.okx.com'; // Production URL
