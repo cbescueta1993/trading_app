@@ -101,7 +101,7 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                     </p>
                 </div>
 
-                <div class="card p-3 shadow">
+                <div class="card p-3 shadow mb-4">
                     <h5>Binance Open Positions</h5>
                     <p>
                         <?php 
