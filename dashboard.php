@@ -165,7 +165,7 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                             if (isset($balanceResponse["code"]) && $balanceResponse["code"] === "0") {
                                 if (isset($balanceResponse["data"]) && !empty($balanceResponse["data"])) {
                                     echo "<table class='table table-sm'>";
-                                    echo "<thead><tr><th>Currency</th><th>Available</th><th>Frozen</th><th>Total</th></tr></thead>";
+                                    echo "<thead><tr><th>Currency</th><th>Available</th><th>Frozen</th></tr></thead>";//<th>Total</th>
                                     echo "<tbody>";
                                     
                                     foreach ($balanceResponse["data"][0]["details"] as $currency) {
@@ -181,7 +181,8 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                                     
                                     // Show account total equity
                                     if (isset($balanceResponse["data"][0]["totalEq"])) {
-                                        echo "<strong>Total Equity: " . $balanceResponse["data"][0]["totalEq"] . " USD</strong>";
+                                        $formatted = sprintf("%.4f", $balanceResponse["data"][0]["totalEq"]);
+                                        echo "<strong>Total Equity: " . $formatted . " USD</strong>";
                                     }
                                 } else {
                                     echo "No balance data available.";
