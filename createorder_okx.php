@@ -29,11 +29,12 @@ $user = $result->fetch_assoc();
 $paramMargin = $user['margin'];
 $paramLeverage = $user['leverage'];
 
+
 class OKXTrading {
     // API credentials - make sure these match your environment (demo or live)
     public $apiKey = "8305ab39-255f-4e4a-a5dd-dff2753b0bce";
     public $secretKey = "AB3C0619E476262ED8ED460276BAD016";
-    public $passphrase = "Elleryc1993$";
+    public $passphrase = "";
     
     // Use the correct base URL
     public $baseUrl = 'https://www.okx.com'; // Production URL
@@ -49,6 +50,7 @@ class OKXTrading {
         if ($this->isDemoTrading) {
             $this->baseUrl = 'https://www.okx.com'; // Demo/Sandbox URL
         }
+
     }
     
     public function setentryPrice($entryPrice) {
@@ -57,6 +59,30 @@ class OKXTrading {
 
     public function setquantity($quantity) {
         $this->_quantity = $quantity;
+    }
+
+    public function setapiKey($param_apiKey) {
+        $this->apiKey = $param_apiKey;
+    }
+
+    public function setsecretKey($param_secretKey) {
+        $this->secretKey = $param_secretKey;
+    }
+
+    public function setpassphrase($param_passphrase) {
+        $this->passphrase = $param_passphrase;
+    }
+
+    public function getapiKey() {
+        return $this->apiKey;
+    }
+
+    public function getsecretKey() {
+        return $this->secretKey;
+    }
+
+    public function getpassphrase() {
+        return $this->passphrase;
     }
 
     public function getentryprice() {
@@ -341,6 +367,14 @@ function logError($conn, $coinName, $errorMessage, $userId) {
 
 // Create trading instance
 $okx = new OKXTrading();
+echo "passPhraseOkx:".$user['passPhraseOkx']. PHP_EOL;
+echo "secretKeyOkx:".$user['secretKeyOkx']. PHP_EOL;
+echo "apiKeyOkx:".$user['apiKeyOkx']. PHP_EOL;
+
+
+$okx->setapiKey($user['apiKeyOkx']);
+$okx->setsecretKey($user['secretKeyOkx']);
+$okx->setpassphrase($user['passPhraseOkx']);
 
 // Set symbol and get instrument ID
 echo "Searching for instrument ID for symbol: $paramSymbol" . PHP_EOL;

@@ -22,11 +22,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $leverage = $_POST['leverage'];
     $api_key = $_POST['api_key'];
     $api_secret = $_POST['api_secret'];
+    $apiKeyOkx = $_POST['apiKeyOkx'];
+    $secretKeyOkx = $_POST['secretKeyOkx'];
+    $passPhraseOkx = $_POST['passPhraseOkx'];
 
     // Update user settings using MySQLi
-    $query = "UPDATE users SET margin = ?, leverage = ?, api_key = ?, api_secret = ? WHERE google_id = ?";
+    $query = "UPDATE users SET margin = ?, leverage = ?, api_key = ?, api_secret = ?, apiKeyOkx = ?, secretKeyOkx = ?, passPhraseOkx = ? WHERE google_id = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("disss", $margin, $leverage, $api_key, $api_secret, $user_id);
+    $stmt->bind_param("dissssss", $margin, $leverage, $api_key, $api_secret, $apiKeyOkx, $secretKeyOkx, $passPhraseOkx, $user_id);
     $stmt->execute();
 
     header("Location: settings.php?success=1");
@@ -40,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Settings</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="icon" type="image/x-icon" href="favicon.ico"></link>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body class="bg-light">
     <nav class="navbar navbar-dark bg-dark">
@@ -49,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </nav>
 
-    
 <div class="container mt-5">
     <h3>Settings</h3>
 
@@ -75,11 +77,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label>Leverage</label>
         <input type="number" name="leverage" class="form-control" value="<?= htmlspecialchars($user['leverage']) ?>" required>
 
-        <label>API Key</label>
+        <label>Binance API Key</label>
         <input type="text" name="api_key" class="form-control" value="<?= htmlspecialchars($user['api_key']) ?>">
 
-        <label>API Secret</label>
+        <label>Binance API Secret</label>
         <input type="text" name="api_secret" class="form-control" value="<?= htmlspecialchars($user['api_secret']) ?>">
+
+        <label>OKX API Key</label>
+        <input type="text" name="apiKeyOkx" class="form-control" value="<?= htmlspecialchars($user['apiKeyOkx']) ?>">
+
+        <label>OKX Secret Key</label>
+        <input type="text" name="secretKeyOkx" class="form-control" value="<?= htmlspecialchars($user['secretKeyOkx']) ?>">
+
+        <label>OKX Passphrase</label>
+        <input type="text" name="passPhraseOkx" class="form-control" value="<?= htmlspecialchars($user['passPhraseOkx']) ?>">
 
         <button type="submit" class="btn btn-success mt-3">Save Changes</button>
     </form>
