@@ -171,8 +171,10 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                                     foreach ($balanceResponse["data"][0]["details"] as $currency) {
                                         echo "<tr>";
                                         echo "<td>" . $currency["ccy"] . "</td>";
-                                        echo "<td>" . $currency["availBal"] . "</td>";
-                                        echo "<td>" . $currency["frozenBal"] . "</td>";
+                                        $formattedavailBal = sprintf("%.4f", $currency["availBal"]);
+                                        echo "<td>" . $formattedavailBal . "</td>";
+                                        $formattedfrozenBal = sprintf("%.4f", $currency["frozenBal"]);
+                                        echo "<td>" . $formattedfrozenBal . "</td>";
                                         // echo "<td>" . $currency["totalEq"] . "</td>";
                                         echo "</tr>";
                                     }

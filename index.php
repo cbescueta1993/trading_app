@@ -19,10 +19,10 @@ if (isset($_SESSION['user_id'])) {
     <div class="container text-center mt-5">
         <h2 class="mb-4">Welcome to Trading App</h2>
         <!-- Logo added above the button -->
-        <img src="logo.jpg" alt="Trading App Logo" class="mb-3" width="150">
+        <img src="logo.png" alt="Trading App Logo" class="mb-3" width="150">
         <br>
-        <a href="google_login.php" class="btn btn-danger btn-lg">
-            <i class="fab fa-google"></i> Login with Google
+        <a href="google_login.php" class="btn btn-success btn-lg">
+            <i class="fab fa-google"></i> Proceed
         </a>
     </div>
 </body>

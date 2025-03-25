@@ -22,7 +22,7 @@ $login_url = $client->createAuthUrl();
 <body class="bg-light">
     <div class="container text-center mt-5">
         <h3>Login to Trading App</h3>
-        <img src="logo.jpg" alt="Trading App Logo" class="mb-3" width="150">
+        <img src="logo.png" alt="Trading App Logo" class="mb-3" width="150">
         <br>
         <a href="<?= $login_url ?>" class="btn btn-danger btn-lg mt-3">
             <i class="fab fa-google"></i> Sign in with Google
