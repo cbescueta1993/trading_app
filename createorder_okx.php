@@ -367,9 +367,9 @@ function logError($conn, $coinName, $errorMessage, $userId) {
 
 // Create trading instance
 $okx = new OKXTrading();
-echo "passPhraseOkx:".$user['passPhraseOkx']. PHP_EOL;
-echo "secretKeyOkx:".$user['secretKeyOkx']. PHP_EOL;
-echo "apiKeyOkx:".$user['apiKeyOkx']. PHP_EOL;
+//echo "passPhraseOkx:".$user['passPhraseOkx']. PHP_EOL;
+//echo "secretKeyOkx:".$user['secretKeyOkx']. PHP_EOL;
+//echo "apiKeyOkx:".$user['apiKeyOkx']. PHP_EOL;
 
 
 $okx->setapiKey($user['apiKeyOkx']);
