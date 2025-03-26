@@ -223,11 +223,11 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                                         $formattedpnl = sprintf("%.4f", $pnl);
 
                                         $pnlClass = $pnl >= 0 ? 'text-success' : 'text-danger';
-                                        $posSide = $position["posSide"] === "long" ? "LONG" : "SHORT";
+                                        //$posSide = $position["posSide"] === "long" ? "LONG" : "SHORT";
                                         
                                         echo "<tr>";
                                         echo "<td>" . $position["instId"] . "</td>";
-                                        echo "<td>" . $position["pos"] . " " . $posSide . "</td>";
+                                        echo "<td>" . $position["pos"]  . "</td>";
                                         echo "<td>" . $position["avgPx"] . "</td>";
                                         echo "<td>" . $position["markPx"] . "</td>";
                                         echo "<td class='$pnlClass'>" . $formattedpnl . "</td>";
