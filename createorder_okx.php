@@ -169,9 +169,8 @@ class OKXTrading {
         return true;
     }
 
-    // Close All Positions for a specific instrument
+    // Close All Positions for a specific instrument with a 3-times retry mechanism
     public function closePositions() {
-        // First check if we have any positions to close
         $positionsEndpoint = "/api/v5/account/positions";
         $params = ["instId" => $this->instId];
         $positions = $this->sendRequestGet($positionsEndpoint, $params);
@@ -180,7 +179,7 @@ class OKXTrading {
         if (!isset($positions["data"]) || empty($positions["data"])) {
             return ["msg" => "No positions to close", "code" => "0"];
         }
-        
+
         $endpoint = "/api/v5/trade/close-position";
         $payload = [
             "instId" => $this->instId,
@@ -188,8 +187,25 @@ class OKXTrading {
             "posSide" => "net"
         ];
 
-        return $this->sendRequest("POST", $endpoint, $payload);
+        $maxRetries = 3;
+        $attempt = 0;
+        $response = null;
+
+        while ($attempt < $maxRetries) {
+            $response = $this->sendRequest("POST", $endpoint, $payload);
+            
+            if (isset($response["code"]) && $response["code"] === "0") {
+                // Successfully closed the position
+                return $response;
+            }
+            
+            $attempt++;
+            sleep(2); // Wait 2 seconds before retrying
+        }
+
+        return ["msg" => "Failed to close position after 3 attempts", "code" => "-1", "response" => $response];
     }
+
 
     // Set Margin Mode to Isolated & Leverage
     public function setLeverage($leverage) {
@@ -347,25 +363,38 @@ class OKXTrading {
         return $lastError;
     }
 
-    // Get instrument ID from symbol
+    // Get instrument ID from symbol with a 3-times retry mechanism
     public function getInsId($symbol) {
         $endpoint = "/api/v5/public/instruments";
         $params = ["instType" => "SWAP"];
         
-        $response = $this->sendRequestGet($endpoint, $params);
-        
-        if (!isset($response["data"])) {
-            return null;
+        $maxRetries = 3;
+        $attempt = 0;
+        $response = null;
+
+        while ($attempt < $maxRetries) {
+            $response = $this->sendRequestGet($endpoint, $params);
+
+            if (isset($response["data"])) {
+                break; // Exit loop if data is received
+            }
+
+            $attempt++;
+            sleep(2); // Wait 2 seconds before retrying
         }
-        
+
+        if (!isset($response["data"])) {
+            return null; // Return null if no valid response after retries
+        }
+
         $symbol = strtoupper($symbol);
-        
+
         foreach ($response["data"] as $instrument) {
             if (strpos($instrument["instId"], $symbol . "-USDT-SWAP") !== false) {
                 return $instrument["instId"];
             }
         }
-        
+
         // Try alternative naming patterns
         foreach ($response["data"] as $instrument) {
             if (strpos($instrument["instId"], $symbol) !== false && 
@@ -373,9 +402,10 @@ class OKXTrading {
                 return $instrument["instId"];
             }
         }
-        
+
         return null;
     }
+
 }
 
 // Log trade to database
