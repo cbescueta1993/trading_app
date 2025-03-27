@@ -29,7 +29,6 @@ $user = $result->fetch_assoc();
 $paramMargin = $user['margin'];
 $paramLeverage = $user['leverage'];
 
-
 class OKXTrading {
     // API credentials - make sure these match your environment (demo or live)
     public $apiKey = "8305ab39-255f-4e4a-a5dd-dff2753b0bce";
@@ -50,7 +49,6 @@ class OKXTrading {
         if ($this->isDemoTrading) {
             $this->baseUrl = 'https://www.okx.com'; // Demo/Sandbox URL
         }
-
     }
     
     public function setentryPrice($entryPrice) {
@@ -308,6 +306,47 @@ class OKXTrading {
         return $this->sendRequest("POST", "/api/v5/trade/order", $payload);
     }
 
+    // New method to handle retry logic for order placement
+    public function placeOrderWithRetry($side, $dollarAmount, $leverage, $maxRetries = 3) {
+        $retries = 0;
+        $lastError = null;
+
+        while ($retries < $maxRetries) {
+            try {
+                // Attempt to place the order
+                $orderResponse = $this->placeOrder($side, $dollarAmount, $leverage);
+                
+                // Check if order was successful
+                if (isset($orderResponse["data"]) && 
+                    isset($orderResponse["data"][0]["ordId"]) && 
+                    !empty($orderResponse["data"][0]["ordId"])) {
+                    return $orderResponse;
+                }
+                
+                // If not successful, store the error
+                $lastError = $orderResponse;
+                
+                // Increment retry counter
+                $retries++;
+                
+                // Wait before next retry (exponential backoff)
+                $waitTime = pow(2, $retries); // 2, 4, 8 seconds
+                echo "Order placement failed. Retry attempt $retries. Waiting $waitTime seconds." . PHP_EOL;
+                sleep($waitTime);
+                
+                // Refresh instrument ID and re-validate
+                $this->instId = $this->getInsId(substr($this->instId, 0, strpos($this->instId, "-")));
+            } catch (Exception $e) {
+                $lastError = ["error" => $e->getMessage()];
+                $retries++;
+                sleep(pow(2, $retries));
+            }
+        }
+        
+        // If all retries fail, return the last error
+        return $lastError;
+    }
+
     // Get instrument ID from symbol
     public function getInsId($symbol) {
         $endpoint = "/api/v5/public/instruments";
@@ -367,10 +406,6 @@ function logError($conn, $coinName, $errorMessage, $userId) {
 
 // Create trading instance
 $okx = new OKXTrading();
-//echo "passPhraseOkx:".$user['passPhraseOkx']. PHP_EOL;
-//echo "secretKeyOkx:".$user['secretKeyOkx']. PHP_EOL;
-//echo "apiKeyOkx:".$user['apiKeyOkx']. PHP_EOL;
-
 
 $okx->setapiKey($user['apiKeyOkx']);
 $okx->setsecretKey($user['secretKeyOkx']);
@@ -397,9 +432,12 @@ echo "Close positions response: " . json_encode($closeResponse) . PHP_EOL;
 $leverageResponse = $okx->setLeverage($paramLeverage);
 echo "Set leverage response: " . json_encode($leverageResponse) . PHP_EOL;
 
-// Step 3: Place the order
-$orderResponse = $okx->placeOrder(strtolower($paramSide), $paramMargin, $paramLeverage);
+// Step 3: Place the order with retry mechanism
+$orderResponse = $okx->placeOrderWithRetry(strtolower($paramSide), $paramMargin, $paramLeverage);
 echo "Order response: " . json_encode($orderResponse) . PHP_EOL;
+
+// Retry tracking variable
+$orderPlaced = false;
 
 // Handle the order response
 if (isset($orderResponse["data"]) && isset($orderResponse["data"][0]["ordId"]) && !empty($orderResponse["data"][0]["ordId"])) {
@@ -408,9 +446,16 @@ if (isset($orderResponse["data"]) && isset($orderResponse["data"][0]["ordId"]) &
     $status = "Success";
     log_trade($conn, $paramUserId, $paramSymbol, $paramSide, $quantity, $entryPrice, $paramLeverage, $paramMargin, $status);
     echo "Order placed successfully!" . PHP_EOL;
+    $orderPlaced = true;
 } else {
     $errorMsg = json_encode($orderResponse);
     logError($conn, $paramSymbol, $errorMsg, $paramUserId);
-    echo "Error placing order: " . $errorMsg . PHP_EOL;
+    echo "Error placing order after all retries: " . $errorMsg . PHP_EOL;
+}
+
+// Additional error handling and logging
+if (!$orderPlaced) {
+    $finalErrorLog = "Failed to place order for symbol $paramSymbol after multiple attempts.";
+    logError($conn, $paramSymbol, $finalErrorLog, $paramUserId);
 }
 ?>
