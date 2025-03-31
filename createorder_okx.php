@@ -24,7 +24,13 @@ $stmt = $conn->prepare($query);
 $stmt->bind_param("s", $paramUserId);
 $stmt->execute();
 $result = $stmt->get_result();
-$user = $result->fetch_assoc();
+
+if ($result->num_rows > 0) {
+    $user = $result->fetch_assoc();
+} else {
+    die("No user found.");
+}
+
 
 $paramMargin = $user['margin'];
 $paramLeverage = $user['leverage'];

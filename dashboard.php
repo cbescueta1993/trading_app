@@ -72,6 +72,18 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                 </a>
             </div>
             <div class="col-md-4">
+                <a href="cryptocoins.php" class="card text-center p-3 shadow text-decoration-none text-dark">
+                    <i class="fas fa-cog fa-3x"></i>
+                    <h5 class="mt-2">Assets List</h5>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="assetperformance.php" class="card text-center p-3 shadow text-decoration-none text-dark">
+                    <i class="fas fa-cog fa-3x"></i>
+                    <h5 class="mt-2">Assets Performance</h5>
+                </a>
+            </div>
+            <div class="col-md-4">
                 <a href="error.php" class="card text-center p-3 shadow text-decoration-none text-dark">
                     <i class="fas fa-exclamation-triangle fa-3x"></i>
                     <h5 class="mt-2">Error logs</h5>
@@ -248,6 +260,10 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                     </p>
                 </div>
             </div>
+
+
+            
+
         </div>
     </div>
 
