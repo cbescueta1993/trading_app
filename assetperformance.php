@@ -5,14 +5,25 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
 }
+
+$user_id = $_SESSION['user_id'];
+$query = "SELECT * FROM users WHERE google_id = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("s", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+
+
+
 // Fetch Data from OKX API
-function fetch_okx_data()
+function fetch_okx_data($paramapiKey,$paramsecretKey,$parampassphrase)
 {
     
     // OKX API Credentials
-    $apiKey = '8305ab39-255f-4e4a-a5dd-dff2753b0bce';
-    $secretKey = 'AB3C0619E476262ED8ED460276BAD016';
-    $passphrase = 'Elleryc1993$';
+    $apiKey = $paramapiKey;
+    $secretKey = $paramsecretKey;
+    $passphrase = $parampassphrase;
     $timestamp = gmdate('Y-m-d\TH:i:s\Z');
     $method = 'GET';
     $requestPath = '/api/v5/account/bills';
@@ -78,7 +89,7 @@ function save_data($data, $conn)
 
 // Fetch OKX data and save to DB
 if (isset($_GET['fetch'])) {
-    $data = fetch_okx_data();
+    $data = fetch_okx_data($user['apiKeyOkx'],$user['secretKeyOkx'],$user['passPhraseOkx']);
     save_data($data, $conn);
 }
 
