@@ -1,13 +1,13 @@
 <?php
 class OKXTrading {
     // API credentials
-    public $apiKey = "";//8305ab39-255f-4e4a-a5dd-dff2753b0bce
-    public $secretKey = "";//AB3C0619E476262ED8ED460276BAD016
-    public $passphrase = "";//Elleryc1993$
+    // public $apiKey = "";//8305ab39-255f-4e4a-a5dd-dff2753b0bce
+    // public $secretKey = "";//AB3C0619E476262ED8ED460276BAD016
+    // public $passphrase = "";//Elleryc1993$
 
-    // public $apiKey = "8305ab39-255f-4e4a-a5dd-dff2753b0bce";//
-    // public $secretKey = "AB3C0619E476262ED8ED460276BAD016";//
-    // public $passphrase = "Elleryc1993$";//
+    public $apiKey = "8305ab39-255f-4e4a-a5dd-dff2753b0bce";//
+    public $secretKey = "AB3C0619E476262ED8ED460276BAD016";//
+    public $passphrase = "Elleryc1993$";//
     
     // Use the correct base URL
     public $baseUrl = 'https://www.okx.com'; // Production URL
@@ -16,7 +16,7 @@ class OKXTrading {
     public $_entryPrice = 0;
     public $_quantity = 0;
     public $instId = ""; // Swap contract for perpetual futures
-    public $isDemoTrading = true; // Set to true for demo/sandbox trading
+    public $isDemoTrading = false; // Set to true for demo/sandbox trading
     
     public function __construct() {
         // If using demo trading, update the base URL accordingly
