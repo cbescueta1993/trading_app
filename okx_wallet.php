@@ -52,8 +52,8 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
 <body class="bg-light">
     <nav class="navbar navbar-dark bg-dark">
         <div class="container d-flex justify-content-between">
-            <a class="navbar-brand" href="#">Trading Dashboard</a>
-            <a href="logout.php" class="btn btn-outline-light">Logout</a>
+        <a class="navbar-brand" href="index.php">Trading Dashboard</a>
+            
         </div>
     </nav>
 

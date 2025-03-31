@@ -99,85 +99,15 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                     <h5 class="mt-2">OKX WALLET</h5>
                 </a>
             </div>
+            <div class="col-md-4">
+                <a href="binance_wallet.php" class="card text-center p-3 shadow text-decoration-none text-dark">
+                    <i class="fas fa-exclamation-triangle fa-3x"></i>
+                    <h5 class="mt-2">BINANCE WALLET</h5>
+                </a>
+            </div>
         </div>
         
         <div class="row mt-5">
-            <div class="col-md-6">
-                <div class="card p-3 shadow mb-4">
-                    <h5>Binance Wallet Balance</h5>
-                    <p>
-                        <?php
-                        $response = binance_futures_request("/fapi/v2/balance", ["timestamp" => $timestamp,"recvWindow" => $recvWindow], "GET");
-
-                        if (!is_array($response)) {
-                            echo "Error: Invalid response from Binance API";
-                        } elseif (isset($response['code'])) {
-                            echo "Error: " . $response['msg'];
-                        } else {
-                            // Loop through the balances and display them
-                            foreach ($response as $balance) {
-                                echo "Asset: " . $balance['asset'] . " - Balance: " . $balance['balance'] . "<br>";
-                            }
-                        }
-                        ?>
-                    </p>
-                </div>
-
-                <div class="card p-3 shadow mb-4">
-                    <h5>Binance Open Positions</h5>
-                    <p>
-                        <?php 
-                        // Get Open Positions from Binance
-                        $response = binance_futures_request('/fapi/v3/positionRisk', ["timestamp" => $timestamp,"recvWindow" => $recvWindow], "GET");
-
-                        if (!is_array($response)) {
-                            echo "Error: Invalid response from Binance API";
-                        } elseif (isset($response['code'])) {
-                            echo "Error: " . $response['msg'];
-                        } else {
-                            // Count Open Positions
-                            $open_positions = 0;
-                            $position_details = [];
-                            
-                            foreach ($response as $position) {
-                                if (abs(floatval($position['positionAmt'])) > 0) { // Check if position is non-zero
-                                    $open_positions++;
-                                    $position_details[] = $position;
-                                }
-                            }
-
-                            echo "<div class='mb-3'>Number of Open Positions: $open_positions</div>";
-
-                            // Display position details if any
-                            if ($open_positions > 0) {
-                                echo "<table class='table table-sm table-striped'>";
-                                echo "<thead><tr><th>Symbol</th><th>Amount</th><th>Entry Price</th><th>PnL</th></tr></thead>";
-                                echo "<tbody>";
-                                
-                                foreach ($position_details as $pos) {
-                                    $pnl = floatval($pos['unRealizedProfit']);
-                                    $pnlClass = $pnl >= 0 ? 'text-success' : 'text-danger';
-                                    
-                                    echo "<tr>";
-                                    echo "<td>" . $pos['symbol'] . "</td>";
-                                    echo "<td>" . $pos['positionAmt'] . "</td>";
-                                    echo "<td>" . $pos['entryPrice'] . "</td>";
-                                    echo "<td class='$pnlClass'>" . $pnl . "</td>";
-                                    echo "</tr>";
-                                }
-                                
-                                echo "</tbody></table>";
-                            }
-                        }
-                        ?>
-                    </p>
-                </div>
-            </div>
-            
-            
-
-
-            
 
         </div>
     </div>
