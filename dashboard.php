@@ -93,6 +93,12 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                     <h5 class="mt-2">Error logs</h5>
                 </a>
             </div>
+            <div class="col-md-4">
+                <a href="okx_wallet.php" class="card text-center p-3 shadow text-decoration-none text-dark">
+                    <i class="fas fa-exclamation-triangle fa-3x"></i>
+                    <h5 class="mt-2">OKX WALLET</h5>
+                </a>
+            </div>
         </div>
         
         <div class="row mt-5">
@@ -168,102 +174,7 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                 </div>
             </div>
             
-            <div class="col-md-6">
-                <div class="card p-3 shadow mb-4">
-                    <h5>OKX Wallet Balance</h5>
-                    <p>
-                        <?php
-                        // Get OKX Wallet Balance
-                        try {
-                            $balanceEndpoint = "/api/v5/account/balance";
-                            $balanceResponse = $okx->sendRequestGet($balanceEndpoint);
-
-                            if (isset($balanceResponse["code"]) && $balanceResponse["code"] === "0") {
-                                if (isset($balanceResponse["data"]) && !empty($balanceResponse["data"])) {
-                                    echo "<table class='table table-sm'>";
-                                    echo "<thead><tr><th>Currency</th><th>Available</th><th>Frozen</th></tr></thead>";//<th>Total</th>
-                                    echo "<tbody>";
-                                    
-                                    foreach ($balanceResponse["data"][0]["details"] as $currency) {
-                                        echo "<tr>";
-                                        echo "<td>" . $currency["ccy"] . "</td>";
-                                        $formattedavailBal = sprintf("%.4f", $currency["availBal"]);
-                                        echo "<td>" . $formattedavailBal . "</td>";
-                                        $formattedfrozenBal = sprintf("%.4f", $currency["frozenBal"]);
-                                        echo "<td>" . $formattedfrozenBal . "</td>";
-                                        // echo "<td>" . $currency["totalEq"] . "</td>";
-                                        echo "</tr>";
-                                    }
-                                    
-                                    echo "</tbody></table>";
-                                    
-                                    // Show account total equity
-                                    if (isset($balanceResponse["data"][0]["totalEq"])) {
-                                        $formatted = sprintf("%.4f", $balanceResponse["data"][0]["totalEq"]);
-                                        echo "<strong>Total Equity: " . $formatted . " USD</strong>";
-                                    }
-                                } else {
-                                    echo "No balance data available.";
-                                }
-                            } else {
-                                echo "Error retrieving balance: " . ($balanceResponse["msg"] ?? "Unknown error");
-                            }
-                        } catch (Exception $e) {
-                            echo "Exception: " . $e->getMessage();
-                        }
-                        ?>
-                    </p>
-                </div>
-
-                <div class="card p-3 shadow">
-                    <h5>OKX Open Positions</h5>
-                    <p>
-                        <?php 
-                        // Get OKX Open Positions
-                        try {
-                            $positionsEndpoint = "/api/v5/account/positions";
-                            $positionsResponse = $okx->sendRequestGet($positionsEndpoint);
-
-                            if (isset($positionsResponse["code"]) && $positionsResponse["code"] === "0") {
-                                if (isset($positionsResponse["data"]) && !empty($positionsResponse["data"])) {
-                                    $positionsCount = count($positionsResponse["data"]);
-                                    echo "<div class='mb-3'>Number of Open Positions: $positionsCount</div>";
-                                    
-                                    echo "<table class='table table-sm table-striped'>";
-                                    echo "<thead><tr><th>Symbol</th><th>Position</th><th>Entry Price</th><th>Mark Price</th><th>PnL</th></tr></thead>";
-                                    echo "<tbody>";
-                                    
-                                    foreach ($positionsResponse["data"] as $position) {
-                                        $pnl = floatval($position["upl"]);
-
-                                        $formattedpnl = sprintf("%.4f", $pnl);
-
-                                        $pnlClass = $pnl >= 0 ? 'text-success' : 'text-danger';
-                                        //$posSide = $position["posSide"] === "long" ? "LONG" : "SHORT";
-                                        
-                                        echo "<tr>";
-                                        echo "<td>" . $position["instId"] . "</td>";
-                                        echo "<td>" . $position["pos"]  . "</td>";
-                                        echo "<td>" . $position["avgPx"] . "</td>";
-                                        echo "<td>" . $position["markPx"] . "</td>";
-                                        echo "<td class='$pnlClass'>" . $formattedpnl . "</td>";
-                                        echo "</tr>";
-                                    }
-                                    
-                                    echo "</tbody></table>";
-                                } else {
-                                    echo "No open positions.";
-                                }
-                            } else {
-                                echo "Error retrieving positions: " . ($positionsResponse["msg"] ?? "Unknown error");
-                            }
-                        } catch (Exception $e) {
-                            echo "Exception: " . $e->getMessage();
-                        }
-                        ?>
-                    </p>
-                </div>
-            </div>
+            
 
 
             
