@@ -84,8 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <td> 
                         <button class='btn btn-warning' data-bs-toggle='modal' data-bs-target='#cryptoModal' onclick='openModal({$row['id']}, \"{$row['name']}\", \"{$row['symbol']}\", \"{$row['price']}\")'>Edit</button>
                         <button class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#deleteModal' onclick='setDeleteId({$row['id']})'>Delete</button>
-                        <a href='https://orchid-boar-297382.hostingersite.com/trading_app/createorder_okx.php?input={$row['name']};BUY;102871033794724054940;' target='_blank' class='btn btn-primary'>Buy</a>
-                        <a href='https://orchid-boar-297382.hostingersite.com/trading_app/createorder_okx.php?input={$row['name']};SELL;102871033794724054940;' target='_blank' class='btn btn-secondary'>Sell</a>
+                        <a href='https://orchid-boar-297382.hostingersite.com/tradingapp/createorder_okx.php?input={$row['name']};BUY;102871033794724054940;' target='_blank' class='btn btn-primary'>Buy</a>
+                        <a href='https://orchid-boar-297382.hostingersite.com/tradingapp/createorder_okx.php?input={$row['name']};SELL;102871033794724054940;' target='_blank' class='btn btn-secondary'>Sell</a>
                     </td>
                   </tr>";
         }
