@@ -119,25 +119,34 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                                     echo "<div class='mb-3'>Number of Open Positions: $positionsCount</div>";
                                     
                                     echo "<table class='table table-sm table-striped'>";
-                                    echo "<thead><tr><th>Symbol</th><th>Position</th><th>Entry Price</th><th>Mark Price</th><th>PnL</th></tr></thead>";
+                                    echo "<thead><tr><th>Symbol</th><th>Position</th><th>Entry Price</th><th>Mark Price</th><th>PnL</th><th>PnL %</th></tr></thead>";
                                     echo "<tbody>";
-                                    
-                                    foreach ($positionsResponse["data"] as $position) {
-                                        $pnl = floatval($position["upl"]);
 
-                                        $formattedpnl = sprintf("%.4f", $pnl);
+                                    foreach ($positionsResponse["data"] as $position) {
+                                        $entryPrice = floatval($position["avgPx"]); // Entry Price
+                                        $markPrice = floatval($position["markPx"]); // Current Market Price
+                                        $positionSize = floatval($position["pos"]); // Number of contracts
+                                        $pnl = floatval($position["upl"]); // Unrealized PnL
+                                        $leverage = floatval($position["lever"]); // Leverage from OKX API
+
+                                        // Correct PnL % Formula with Leverage
+                                        $pnlPercentage = (($markPrice - $entryPrice) / $entryPrice) * $leverage * 100;
+                                        $formattedPnlPercentage = sprintf("%.2f", $pnlPercentage);
 
                                         $pnlClass = $pnl >= 0 ? 'text-success' : 'text-danger';
-                                        //$posSide = $position["posSide"] === "long" ? "LONG" : "SHORT";
-                                        
+
                                         echo "<tr>";
                                         echo "<td>" . $position["instId"] . "</td>";
                                         echo "<td>" . $position["pos"]  . "</td>";
                                         echo "<td>" . $position["avgPx"] . "</td>";
                                         echo "<td>" . $position["markPx"] . "</td>";
-                                        echo "<td class='$pnlClass'>" . $formattedpnl . "</td>";
+                                        echo "<td class='$pnlClass'>" . sprintf("%.4f", $pnl) . "</td>";
+                                        echo "<td class='$pnlClass'>" . $formattedPnlPercentage . "%</td>";
                                         echo "</tr>";
                                     }
+
+
+
                                     
                                     echo "</tbody></table>";
                                 } else {
