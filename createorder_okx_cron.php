@@ -4,14 +4,14 @@ ignore_user_abort(true); // Allow script to continue if client disconnects
 require_once 'config.php';
 
 //$userid = $argv[1] ?? "";
-//$userid = isset($_GET["userid"]) ? $_GET["userid"] : '';//"102871033794724054940"
+$userid = isset($_GET["userid"]) ? $_GET["userid"] : '';//"102871033794724054940" 12
 //public_html/tradingapp/createorder_okx_cron.php?userid=102871033794724054940
 // SYMBOL;SIDE;GOOGLEID;
 //$parts = explode(';', $input);
 $paramSymbol = "";
 $paramSide = "";
-$paramUserId = "102871033794724054940";
-$paramSymbolId="";
+$paramUserId = $userid;
+$paramSymbolId=""; 
 
 $query = "SELECT * FROM alertlogs where isexecuted = 0 LIMIT 1";
 $stmt = $conn->prepare($query);
