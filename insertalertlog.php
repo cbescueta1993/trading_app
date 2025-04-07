@@ -27,7 +27,7 @@ function logAlert($conn, $coin, $side) {
         $stmt->bind_param("ss", $coin, $side);
         $stmt->execute();
         $stmt->close();
-        echo "Error logged: $coin - $errorMessage" . PHP_EOL;
+        //echo "Error logged: $coin - $errorMessage" . PHP_EOL;
     } catch (Exception $e) {
         echo "Error logging to database: " . $e->getMessage() . PHP_EOL;
     }
