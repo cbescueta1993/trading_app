@@ -3,14 +3,14 @@ date_default_timezone_set('Asia/Manila');
 ignore_user_abort(true); // Allow script to continue if client disconnects
 require_once 'config.php';
 
-$userid = $argv[1] ?? "";
+//$userid = $argv[1] ?? "";
 //$userid = isset($_GET["userid"]) ? $_GET["userid"] : '';//"102871033794724054940"
 //public_html/tradingapp/createorder_okx_cron.php?userid=102871033794724054940
 // SYMBOL;SIDE;GOOGLEID;
 //$parts = explode(';', $input);
 $paramSymbol = "";
 $paramSide = "";
-$paramUserId = $userid;
+$paramUserId = "102871033794724054940";
 $paramSymbolId="";
 
 $query = "SELECT * FROM alertlogs where isexecuted = 0 LIMIT 1";
