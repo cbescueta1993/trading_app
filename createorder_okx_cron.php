@@ -456,7 +456,7 @@ function updateAlertLogs($conn, $alertlogsid) {
         $stmt->bind_param("s", $alertlogsid);
         $stmt->execute();
         $stmt->close();
-        echo "Error alert logged: $alertlogsid - $errorMessage" . PHP_EOL;
+        //echo "Error alert logged: $alertlogsid - $errorMessage" . PHP_EOL;
     } catch (Exception $e) {
         echo "Error logging to database: " . $e->getMessage() . PHP_EOL;
     }
