@@ -3,6 +3,47 @@ date_default_timezone_set('Asia/Manila');
 ignore_user_abort(true); // Allow script to continue if client disconnects
 require_once 'config.php';
 
+$filename = "alertlog_okx.txt";
+
+// Log error to database if dateTime does not already exist
+function logAlertIfNotExists($conn, $coin, $side, $dateTime) {
+    // Check if the record with same dateTime already exists
+    $checkStmt = $conn->prepare("SELECT id FROM alertlogs WHERE dateTime = ?");
+    $checkStmt->bind_param("s", $dateTime);
+    $checkStmt->execute();
+    $checkStmt->store_result();
+
+    if ($checkStmt->num_rows == 0) {
+        // Insert new log
+        $insertStmt = $conn->prepare("INSERT INTO alertlogs (coin, side, dateTime) VALUES (?, ?, ?)");
+        $insertStmt->bind_param("sss", $coin, $side, $dateTime);
+        $insertStmt->execute();
+        $insertStmt->close();
+    }
+
+    $checkStmt->close();
+}
+
+if (file_exists($filename)) {
+    $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+    foreach ($lines as $line) {
+        $parts = explode(';', trim($line));
+
+        if (count($parts) === 3) {
+            $symbol = trim($parts[0]);
+            $side = trim($parts[1]);
+            $dateTime = trim($parts[2]);
+
+            logAlertIfNotExists($conn, $symbol, $side, $dateTime);
+        }
+    }
+
+    echo "Processing complete.";
+} else {
+    echo "File not found: $filename";
+}
+
 //$userid = $argv[1] ?? "";
 $userid = isset($_GET["userid"]) ? $_GET["userid"] : '';//"102871033794724054940" 12
 //public_html/tradingapp/createorder_okx_cron.php?userid=102871033794724054940
