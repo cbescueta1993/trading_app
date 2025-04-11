@@ -8,8 +8,8 @@ $filename = "alertlog_okx.txt";
 // Log error to database if dateTime does not already exist
 function logAlertIfNotExists($conn, $coin, $side, $dateTime) {
     // Check if the record with same dateTime already exists
-    $checkStmt = $conn->prepare("SELECT id FROM alertlogs WHERE dateTime = ?");
-    $checkStmt->bind_param("s", $dateTime);
+    $checkStmt = $conn->prepare("SELECT id FROM alertlogs WHERE dateTime = ? and coin= ?");
+    $checkStmt->bind_param("ss", $dateTime,$coin);
     $checkStmt->execute();
     $checkStmt->store_result();
 
