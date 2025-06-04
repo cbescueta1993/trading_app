@@ -32,7 +32,7 @@ if ($result->num_rows > 0) {
 }
 
 
-$paramMargin = $user['margin'];
+$paramMargin = $user['margin']/100;
 $paramLeverage = $user['leverage'];
 
 class OKXTrading {
@@ -412,6 +412,30 @@ class OKXTrading {
         return null;
     }
 
+    public function getWalletBalance(){
+        try {
+            $totalbal =0;
+            $balanceEndpoint = "/api/v5/account/balance";
+            $balanceResponse = $this->sendRequestGet($balanceEndpoint);
+
+            if (isset($balanceResponse["code"]) && $balanceResponse["code"] === "0") {
+                if (isset($balanceResponse["data"]) && !empty($balanceResponse["data"])) {
+                    if (isset($balanceResponse["data"][0]["totalEq"])) {
+                        $formatted = sprintf("%.4f", $balanceResponse["data"][0]["totalEq"]);
+                        $totalbal= $formatted; 
+                    }
+                } else {
+                    $totalbal= -1; 
+                }
+            } else {
+                $totalbal= -1; 
+            }
+        } catch (Exception $e) {
+            $totalbal= -1; 
+        }
+        return $totalbal;
+    }
+
 }
 
 // Log trade to database
@@ -447,6 +471,9 @@ $okx->setapiKey($user['apiKeyOkx']);
 $okx->setsecretKey($user['secretKeyOkx']);
 $okx->setpassphrase($user['passPhraseOkx']);
 
+$okxWalletBalance=$okx->getWalletBalance();
+
+$paramMargin=round(($paramMargin * $okxWalletBalance),2);
 // Set symbol and get instrument ID
 echo "Searching for instrument ID for symbol: $paramSymbol" . PHP_EOL;
 $instrumentId = $okx->getInsId($paramSymbol);
