@@ -535,7 +535,9 @@ $okx->setapiKey($user['apiKeyOkx']);
 $okx->setsecretKey($user['secretKeyOkx']);
 $okx->setpassphrase($user['passPhraseOkx']);
 
-$paramMargin=($paramMargin * $okx->getWalletBalance());
+$okxWalletBalance=$okx->getWalletBalance();
+
+$paramMargin=round(($paramMargin * $okxWalletBalance),2);
 
 // Set symbol and get instrument ID
 echo "Searching for instrument ID for symbol: $paramSymbol" . PHP_EOL;
