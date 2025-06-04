@@ -62,44 +62,47 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                     <h5>OKX Wallet Balance</h5>
                     <p>
                         <?php
+                        $totalbalance = $okx->getWalletBalance();
+                        $formatted = sprintf("%.4f", $totalbalance);
+                        echo "<strong>Total Equity: " . $formatted . " USD</strong>";
                         // Get OKX Wallet Balance
-                        try {
-                            $balanceEndpoint = "/api/v5/account/balance";
-                            $balanceResponse = $okx->sendRequestGet($balanceEndpoint);
+                        // try {
+                        //     $balanceEndpoint = "/api/v5/account/balance";
+                        //     $balanceResponse = $okx->sendRequestGet($balanceEndpoint);
 
-                            if (isset($balanceResponse["code"]) && $balanceResponse["code"] === "0") {
-                                if (isset($balanceResponse["data"]) && !empty($balanceResponse["data"])) {
-                                    echo "<table class='table table-sm'>";
-                                    echo "<thead><tr><th>Currency</th><th>Available</th><th>Frozen</th></tr></thead>";//<th>Total</th>
-                                    echo "<tbody>";
+                        //     if (isset($balanceResponse["code"]) && $balanceResponse["code"] === "0") {
+                        //         if (isset($balanceResponse["data"]) && !empty($balanceResponse["data"])) {
+                        //             echo "<table class='table table-sm'>";
+                        //             echo "<thead><tr><th>Currency</th><th>Available</th><th>Frozen</th></tr></thead>";//<th>Total</th>
+                        //             echo "<tbody>";
                                     
-                                    foreach ($balanceResponse["data"][0]["details"] as $currency) {
-                                        echo "<tr>";
-                                        echo "<td>" . $currency["ccy"] . "</td>";
-                                        $formattedavailBal = sprintf("%.4f", $currency["availBal"]);
-                                        echo "<td>" . $formattedavailBal . "</td>";
-                                        $formattedfrozenBal = sprintf("%.4f", $currency["frozenBal"]);
-                                        echo "<td>" . $formattedfrozenBal . "</td>";
-                                        // echo "<td>" . $currency["totalEq"] . "</td>";
-                                        echo "</tr>";
-                                    }
+                        //             foreach ($balanceResponse["data"][0]["details"] as $currency) {
+                        //                 echo "<tr>";
+                        //                 echo "<td>" . $currency["ccy"] . "</td>";
+                        //                 $formattedavailBal = sprintf("%.4f", $currency["availBal"]);
+                        //                 echo "<td>" . $formattedavailBal . "</td>";
+                        //                 $formattedfrozenBal = sprintf("%.4f", $currency["frozenBal"]);
+                        //                 echo "<td>" . $formattedfrozenBal . "</td>";
+                        //                 // echo "<td>" . $currency["totalEq"] . "</td>";
+                        //                 echo "</tr>";
+                        //             }
                                     
-                                    echo "</tbody></table>";
+                        //             echo "</tbody></table>";
                                     
-                                    // Show account total equity
-                                    if (isset($balanceResponse["data"][0]["totalEq"])) {
-                                        $formatted = sprintf("%.4f", $balanceResponse["data"][0]["totalEq"]);
-                                        echo "<strong>Total Equity: " . $formatted . " USD</strong>";
-                                    }
-                                } else {
-                                    echo "No balance data available.";
-                                }
-                            } else {
-                                echo "Error retrieving balance: " . ($balanceResponse["msg"] ?? "Unknown error");
-                            }
-                        } catch (Exception $e) {
-                            echo "Exception: " . $e->getMessage();
-                        }
+                        //             // Show account total equity
+                        //             if (isset($balanceResponse["data"][0]["totalEq"])) {
+                        //                 $formatted = sprintf("%.4f", $balanceResponse["data"][0]["totalEq"]);
+                        //                 echo "<strong>Total Equity: " . $formatted . " USD</strong>";
+                        //             }
+                        //         } else {
+                        //             echo "No balance data available.";
+                        //         }
+                        //     } else {
+                        //         echo "Error retrieving balance: " . ($balanceResponse["msg"] ?? "Unknown error");
+                        //     }
+                        // } catch (Exception $e) {
+                        //     echo "Exception: " . $e->getMessage();
+                        // }
                         ?>
                     </p>
                 </div>

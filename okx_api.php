@@ -148,5 +148,29 @@ class OKXTrading {
         
         return null;
     }
+
+    public function getWalletBalance(){
+        try {
+            $totalbal =0;
+            $balanceEndpoint = "/api/v5/account/balance";
+            $balanceResponse = $okx->sendRequestGet($balanceEndpoint);
+
+            if (isset($balanceResponse["code"]) && $balanceResponse["code"] === "0") {
+                if (isset($balanceResponse["data"]) && !empty($balanceResponse["data"])) {
+                    if (isset($balanceResponse["data"][0]["totalEq"])) {
+                        $formatted = sprintf("%.4f", $balanceResponse["data"][0]["totalEq"]);
+                        $totalbal= $formatted; 
+                    }
+                } else {
+                    $totalbal= -1; 
+                }
+            } else {
+                $totalbal= -1; 
+            }
+        } catch (Exception $e) {
+            $totalbal= -1; 
+        }
+        return $totalbal;
+    }
 }
 ?>

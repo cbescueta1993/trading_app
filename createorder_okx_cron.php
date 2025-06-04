@@ -463,7 +463,31 @@ class OKXTrading {
         return null;
     }
 
-}
+    public function getWalletBalance(){
+        try {
+            $totalbal =0;
+            $balanceEndpoint = "/api/v5/account/balance";
+            $balanceResponse = $okx->sendRequestGet($balanceEndpoint);
+
+            if (isset($balanceResponse["code"]) && $balanceResponse["code"] === "0") {
+                if (isset($balanceResponse["data"]) && !empty($balanceResponse["data"])) {
+                    if (isset($balanceResponse["data"][0]["totalEq"])) {
+                        $formatted = sprintf("%.4f", $balanceResponse["data"][0]["totalEq"]);
+                        $totalbal= $formatted; 
+                    }
+                } else {
+                    $totalbal= 0; 
+                }
+            } else {
+                $totalbal= 0; 
+            }
+        } catch (Exception $e) {
+            $totalbal= 0; 
+        }
+        return $totalbal;
+    }
+
+}//end class
 
 // Log trade to database
 function log_trade($conn, $google_id, $symbol, $side, $quantity, $entry_price, $leverage, $margin, $status) {
