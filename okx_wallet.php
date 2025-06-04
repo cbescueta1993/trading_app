@@ -62,7 +62,9 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                     <h5>OKX Wallet Balance</h5>
                     <p>
                         <?php
+                        echo "test";
                         $totalbalance = $okx->getWalletBalance();
+                        echo "test1";
                         $formatted = sprintf("%.4f", $totalbalance);
                         echo "<strong>Total Equity: " . $formatted . " USD</strong>";
                         // Get OKX Wallet Balance
