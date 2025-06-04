@@ -83,7 +83,7 @@ if ($result->num_rows > 0) {
 }
 
 
-$paramMargin = $user['margin']/100;
+$paramMargin = $user['margin'];
 $paramLeverage = $user['leverage'];
 
 class OKXTrading {
