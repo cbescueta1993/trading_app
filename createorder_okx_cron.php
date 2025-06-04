@@ -83,7 +83,7 @@ if ($result->num_rows > 0) {
 }
 
 
-$paramMargin = $user['margin'];
+$paramMargin = $user['margin']/100;
 $paramLeverage = $user['leverage'];
 
 class OKXTrading {
@@ -535,7 +535,7 @@ $okx->setapiKey($user['apiKeyOkx']);
 $okx->setsecretKey($user['secretKeyOkx']);
 $okx->setpassphrase($user['passPhraseOkx']);
 
-$paramMargin=(($paramMargin/100) * $okx->getWalletBalance());
+$paramMargin=($paramMargin * $okx->getWalletBalance());
 
 // Set symbol and get instrument ID
 echo "Searching for instrument ID for symbol: $paramSymbol" . PHP_EOL;
