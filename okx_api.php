@@ -5,8 +5,8 @@ class OKXTrading {
     // public $secretKey = "";//AB3C0619E476262ED8ED460276BAD016
     // public $passphrase = "";//Elleryc1993$
 
-    public $apiKey = "8305ab39-255f-4e4a-a5dd-dff2753b0bce";//
-    public $secretKey = "AB3C0619E476262ED8ED460276BAD016";//
+    public $apiKey = "6234c67b-0ed5-4cec-b6da-1fa434bbd90f";//
+    public $secretKey = "6DE1E1CA2B1B46741A8DFBB584F39F8E";//
     public $passphrase = "Elleryc1993$";//
     
     // Use the correct base URL
