@@ -153,7 +153,7 @@ class OKXTrading {
         try {
             $totalbal =0;
             $balanceEndpoint = "/api/v5/account/balance";
-            $balanceResponse = $okx->sendRequestGet($balanceEndpoint);
+            $balanceResponse = $this->sendRequestGet($balanceEndpoint);
 
             if (isset($balanceResponse["code"]) && $balanceResponse["code"] === "0") {
                 if (isset($balanceResponse["data"]) && !empty($balanceResponse["data"])) {
