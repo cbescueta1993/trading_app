@@ -58,6 +58,7 @@ class OKXTrading {
         $this->$apiKey=$param1;
         $this->$secretKey=$param2;
         $this->$passphrase=$param3;
+        echo "apikey".$apiKey.$secretKey.$passphrase;
     }
     
     public function setentryPrice($entryPrice) {
