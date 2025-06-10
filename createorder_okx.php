@@ -53,6 +53,20 @@ function log_trade($conn, $google_id, $symbol, $side, $quantity, $entry_price, $
 // Log error to database
 function logError($conn, $coinName, $errorMessage, $userId) {
     try {
+        // Check if connection is alive
+        if (!$conn->ping()) {
+            echo "Reconnecting to the database..." . PHP_EOL;
+
+            // Reconnect (replace these with your actual DB credentials)
+            $conn->close();
+            $conn = new mysqli("localhost", "your_user", "your_password", "your_database");
+
+            if ($conn->connect_error) {
+                echo "Reconnect failed: " . $conn->connect_error . PHP_EOL;
+                return;
+            }
+        }
+
         $stmt = $conn->prepare("INSERT INTO error_logs (coin_name, error_message, google_id) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $coinName, $errorMessage, $userId);
         $stmt->execute();
