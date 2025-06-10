@@ -62,6 +62,9 @@ function logError($conn, $coinName, $errorMessage, $userId) {
         echo "Error logging to database: " . $e->getMessage() . PHP_EOL;
     }
 }
+$errorMessage="test";
+logError($conn, $paramSymbol, $errorMessage, $paramUserId);
+die();
 //echo "cred".$user['apiKeyOkx'].$user['secretKeyOkx'].$user['passPhraseOkx'];
 // Create trading instance
 $okx = new OKXTrading($user['apiKeyOkx'], $user['secretKeyOkx'], $user['passPhraseOkx']);
