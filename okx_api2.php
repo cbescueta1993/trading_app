@@ -6,7 +6,7 @@ class OKXTrading {
     public $passphrase = "";//Elleryc1993$
     
     // Use the correct base URL
-    public $baseUrl = 'https://www.okx.com'; // Production URL
+    public $baseUrl = ''; // Production URL
     // For demo trading use: https://www.okx-sandbox.com
     
     public $_entryPrice = 0;
@@ -19,13 +19,13 @@ class OKXTrading {
         if ($this->isDemoTrading) {
             $this->baseUrl = 'https://www.okx.com'; // Demo/Sandbox URL
         }
-        $this->apiKey=$param1;
-        $this->secretKey=$param2;
-        $this->passphrase=$param3;
+        $this->apiKey = $param1;
+        $this->secretKey = $param2;
+        $this->passphrase = $param3;
         //echo "apikey".$apiKey.$secretKey.$passphrase;
-        setapiKey($param1);
-        setsecretKey($param2);
-        setpassphrase($param3);
+        $this->setapiKey($param1);
+        $this->setsecretKey($param2);
+        $this->setpassphrase($param3);
     }
     
     public function setentryPrice($entryPrice) {
