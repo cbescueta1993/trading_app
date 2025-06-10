@@ -2,7 +2,7 @@
 date_default_timezone_set('Asia/Manila');
 ignore_user_abort(true); // Allow script to continue if client disconnects
 require_once 'config.php';
-
+require_once 'okx_api2.php'; // or include_once
 $input = isset($_GET["input"]) ? $_GET["input"] : '';
 
 // SYMBOL;SIDE;GOOGLEID;
