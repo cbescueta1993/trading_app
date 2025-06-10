@@ -22,7 +22,10 @@ class OKXTrading {
         $this->$apiKey=$param1;
         $this->$secretKey=$param2;
         $this->$passphrase=$param3;
-        echo "apikey".$apiKey.$secretKey.$passphrase;
+        //echo "apikey".$apiKey.$secretKey.$passphrase;
+        setapiKey($param1);
+        setsecretKey($param2);
+        setpassphrase($param3);
     }
     
     public function setentryPrice($entryPrice) {
