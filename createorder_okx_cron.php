@@ -101,11 +101,14 @@ class OKXTrading {
     public $instId = ""; // Swap contract for perpetual futures
     public $isDemoTrading = false; // Set to true for demo/sandbox trading
     
-    public function __construct() {
+    public function __construct($param1, $param2, $param3) {
         // If using demo trading, update the base URL accordingly
         if ($this->isDemoTrading) {
             $this->baseUrl = 'https://www.okx.com'; // Demo/Sandbox URL
         }
+        $this->$apiKey=$param1;
+        $this->$secretKey=$param2;
+        $this->$passphrase=$param3;
     }
     
     public function setentryPrice($entryPrice) {
@@ -529,11 +532,11 @@ function updateAlertLogs($conn, $alertlogsid) {
 }
 
 // Create trading instance
-$okx = new OKXTrading();
+$okx = new OKXTrading($user['apiKeyOkx'], $user['secretKeyOkx'], $user['passPhraseOkx']);
 
-$okx->setapiKey($user['apiKeyOkx']);
-$okx->setsecretKey($user['secretKeyOkx']);
-$okx->setpassphrase($user['passPhraseOkx']);
+//$okx->setapiKey($user['apiKeyOkx']);
+//$okx->setsecretKey($user['secretKeyOkx']);
+//$okx->setpassphrase($user['passPhraseOkx']);
 
 $okxWalletBalance=$okx->getWalletBalance();
 
