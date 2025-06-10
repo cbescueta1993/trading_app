@@ -14,14 +14,14 @@ class OKXTrading {
     public $instId = ""; // Swap contract for perpetual futures
     public $isDemoTrading = false; // Set to true for demo/sandbox trading
     
-    public function OKXTrading($param1, $param2, $param3) {
+    public function __construct($param1, $param2, $param3) {
         // If using demo trading, update the base URL accordingly
         if ($this->isDemoTrading) {
             $this->baseUrl = 'https://www.okx.com'; // Demo/Sandbox URL
         }
-        $this->$apiKey=$param1;
-        $this->$secretKey=$param2;
-        $this->$passphrase=$param3;
+        $this->apiKey=$param1;
+        $this->secretKey=$param2;
+        $this->passphrase=$param3;
         //echo "apikey".$apiKey.$secretKey.$passphrase;
         setapiKey($param1);
         setsecretKey($param2);
