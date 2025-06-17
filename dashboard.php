@@ -105,6 +105,12 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                     <h5 class="mt-2">BINANCE WALLET</h5>
                 </a>
             </div>
+            <div class="col-md-4">
+                <a href="maintenance.php" class="card text-center p-3 shadow text-decoration-none text-dark">
+                    <i class="fas fa-exclamation-triangle fa-3x"></i>
+                    <h5 class="mt-2">MAINTENANCE</h5>
+                </a>
+            </div>
         </div>
         
         <div class="row mt-5">
