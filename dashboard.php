@@ -96,19 +96,19 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
             <div class="col-md-4">
                 <a href="okx_wallet.php" class="card text-center p-3 shadow text-decoration-none text-dark">
                     <i class="fas fa-exclamation-triangle fa-3x"></i>
-                    <h5 class="mt-2">OKX WALLET</h5>
+                    <h5 class="mt-2">Okx Wallet</h5>
                 </a>
             </div>
             <div class="col-md-4">
                 <a href="binance_wallet.php" class="card text-center p-3 shadow text-decoration-none text-dark">
                     <i class="fas fa-exclamation-triangle fa-3x"></i>
-                    <h5 class="mt-2">BINANCE WALLET</h5>
+                    <h5 class="mt-2">Binance Wallet</h5>
                 </a>
             </div>
             <div class="col-md-4">
                 <a href="maintenance.php" class="card text-center p-3 shadow text-decoration-none text-dark">
                     <i class="fas fa-exclamation-triangle fa-3x"></i>
-                    <h5 class="mt-2">MAINTENANCE</h5>
+                    <h5 class="mt-2">Maintenance</h5>
                 </a>
             </div>
         </div>
