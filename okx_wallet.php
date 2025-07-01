@@ -145,7 +145,7 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                                             $pnlPercentage = 0;
                                         }
 
-                                        $formattedPnlPercentage = sprintf("%.2f", $pnlPercentage);
+                                        $formattedPnlPercentage = sprintf("%.2f", abs($pnlPercentage));
                                         $pnlClass = $pnl >= 0 ? 'text-success' : 'text-danger';
 
                                         // Position label formatting
