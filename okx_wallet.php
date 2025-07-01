@@ -122,29 +122,37 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                                 if (isset($positionsResponse["data"]) && !empty($positionsResponse["data"])) {
                                     $positionsCount = count($positionsResponse["data"]);
                                     echo "<div class='mb-3'>Number of Open Positions: $positionsCount</div>";
-                                    
+
                                     echo "<table class='table table-sm table-striped'>";
                                     echo "<thead><tr><th>Symbol</th><th>Position</th><th>Entry Price</th><th>Mark Price</th><th>PnL</th><th>PnL %</th></tr></thead>";
                                     echo "<tbody>";
 
                                     foreach ($positionsResponse["data"] as $position) {
-                                        $entryPrice = floatval($position["avgPx"]); // Entry Price
-                                        $markPrice = floatval($position["markPx"]); // Current Market Price
-                                        $positionSize = floatval($position["pos"]); // Number of contracts
-                                        $pnl = floatval($position["upl"]); // Unrealized PnL
-                                        $leverage = floatval($position["lever"]); // Leverage from OKX API
+                                        $entryPrice = floatval($position["avgPx"]);     // Entry Price
+                                        $markPrice = floatval($position["markPx"]);     // Current Market Price
+                                        $positionSize = floatval($position["pos"]);     // Number of contracts
+                                        $pnl = floatval($position["upl"]);              // Unrealized PnL
+                                        $leverage = floatval($position["lever"]);       // Leverage
 
-                                        // Correct PnL % Formula with Leverage
+                                        // PnL %
                                         $pnlPercentage = (($markPrice - $entryPrice) / $entryPrice) * $leverage * 100;
                                         $formattedPnlPercentage = sprintf("%.2f", $pnlPercentage);
 
+                                        // Color based on PnL
                                         $pnlClass = $pnl >= 0 ? 'text-success' : 'text-danger';
 
+                                        // Label for position type
+                                        if ($positionSize < 0) {
+                                            $positionLabel = "<strong>Short (" . abs($positionSize) . ")</strong>";
+                                        } else {
+                                            $positionLabel = "Long (" . $positionSize . ")";
+                                        }
+
                                         echo "<tr>";
-                                        echo "<td>" . $position["instId"] . "</td>";
-                                        echo "<td>" . $position["pos"]  . "</td>";
-                                        echo "<td>" . $position["avgPx"] . "</td>";
-                                        echo "<td>" . $position["markPx"] . "</td>";
+                                        echo "<td>" . htmlspecialchars($position["instId"]) . "</td>";
+                                        echo "<td>" . $positionLabel . "</td>";
+                                        echo "<td>" . htmlspecialchars($position["avgPx"]) . "</td>";
+                                        echo "<td>" . htmlspecialchars($position["markPx"]) . "</td>";
                                         echo "<td class='$pnlClass'>" . sprintf("%.4f", $pnl) . "</td>";
                                         echo "<td class='$pnlClass'>" . $formattedPnlPercentage . "%</td>";
                                         echo "</tr>";
