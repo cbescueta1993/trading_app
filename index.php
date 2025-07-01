@@ -17,7 +17,7 @@ if (isset($_SESSION['user_id'])) {
 </head>
 <body class="bg-light">
     <div class="container text-center mt-5">
-        <h2 class="mb-4">Welcome to Trading Apps</h2>
+        <h2 class="mb-4">Welcome to Trading App</h2>
         <!-- Logo added above the button -->
         <img src="logo.png" alt="Trading App Logo" class="mb-3" width="150">
         <br>
