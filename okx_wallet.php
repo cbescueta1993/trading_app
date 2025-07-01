@@ -128,20 +128,27 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                                     echo "<tbody>";
 
                                     foreach ($positionsResponse["data"] as $position) {
-                                        $entryPrice = floatval($position["avgPx"]);     // Entry Price
-                                        $markPrice = floatval($position["markPx"]);     // Current Market Price
-                                        $positionSize = floatval($position["pos"]);     // Number of contracts
-                                        $pnl = floatval($position["upl"]);              // Unrealized PnL
-                                        $leverage = floatval($position["lever"]);       // Leverage
+                                        $entryPrice = floatval($position["avgPx"]);
+                                        $markPrice = floatval($position["markPx"]);
+                                        $positionSize = floatval($position["pos"]);
+                                        $pnl = floatval($position["upl"]);
+                                        $leverage = floatval($position["lever"]);
 
-                                        // PnL %
-                                        $pnlPercentage = (($markPrice - $entryPrice) / $entryPrice) * $leverage * 100;
+                                        // Calculate correct PnL % based on position type
+                                        if ($positionSize > 0) {
+                                            // Long
+                                            $pnlPercentage = (($markPrice - $entryPrice) / $entryPrice) * $leverage * 100;
+                                        } elseif ($positionSize < 0) {
+                                            // Short
+                                            $pnlPercentage = (($entryPrice - $markPrice) / $entryPrice) * $leverage * 100;
+                                        } else {
+                                            $pnlPercentage = 0;
+                                        }
+
                                         $formattedPnlPercentage = sprintf("%.2f", $pnlPercentage);
-
-                                        // Color based on PnL
                                         $pnlClass = $pnl >= 0 ? 'text-success' : 'text-danger';
 
-                                        // Label for position type
+                                        // Position label formatting
                                         if ($positionSize < 0) {
                                             $positionLabel = "<strong>Short (" . abs($positionSize) . ")</strong>";
                                         } else {
@@ -157,11 +164,8 @@ $okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false fo
                                         echo "<td class='$pnlClass'>" . $formattedPnlPercentage . "%</td>";
                                         echo "</tr>";
                                     }
-
-
-
-                                    
                                     echo "</tbody></table>";
+
                                 } else {
                                     echo "No open positions.";
                                 }
