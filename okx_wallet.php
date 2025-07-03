@@ -29,15 +29,17 @@ $timestamp = round(microtime(true) * 1000); // Ensure timestamp is included
 $recvWindow = 10000; // Recommended recvWindow to prevent timing issues
 
 // Initialize OKX API
-$okx = new OKXTrading();
-$okx->apiKey = $user['apiKeyOkx'];//"8305ab39-255f-4e4a-a5dd-dff2753b0bce";
-$okx->secretKey = $user['secretKeyOkx'];//"AB3C0619E476262ED8ED460276BAD016";
-$okx->passphrase = $user['passPhraseOkx'];//"Elleryc1993$";
+//$okx = new OKXTrading();
+//$okx->apiKey = $user['apiKeyOkx'];//"8305ab39-255f-4e4a-a5dd-dff2753b0bce";
+//$okx->secretKey = $user['secretKeyOkx'];//"AB3C0619E476262ED8ED460276BAD016";
+//$okx->passphrase = $user['passPhraseOkx'];//"Elleryc1993$";
 
 // $okx->apiKey = "8305ab39-255f-4e4a-a5dd-dff2753b0bce";
 // $okx->secretKey = "AB3C0619E476262ED8ED460276BAD016";
 // $okx->passphrase = "Elleryc1993$";
-$okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false for live trading
+//$okx->isDemoTrading = false; // Set to true for demo/sandbox trading or false for live trading
+
+$okx = new OKXTrading($user['apiKeyOkx'], $user['secretKeyOkx'], $user['passPhraseOkx']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
