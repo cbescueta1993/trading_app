@@ -1,4 +1,5 @@
 <?php
+echo file_get_contents("https://api.ipify.org");
 require 'config.php';
 
 if (isset($_SESSION['user_id'])) {
