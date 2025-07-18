@@ -77,7 +77,8 @@ class OKXTrading {
     // Send API Request (GET, POST, DELETE)
     public function sendRequest($method, $endpoint, $payload = []) {
         $url = $this->baseUrl . $endpoint;
-        $timestamp = number_format(microtime(true), 3, '.', '');
+        //$timestamp = number_format(microtime(true), 3, '.', '');
+        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
         $body = ($method === "POST" || $method === "DELETE") ? json_encode($payload) : "";
 
         $headers = [
